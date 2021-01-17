@@ -6,19 +6,20 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.json({data: 'Hello world'});
-});
-
-app.get('/add', (req, res) => {
-  res.json({Açıklama: 'send post'});
+app.get('/', async (req, res) => {
+   const todos = await ToDo.findAll();
+   res.json({data: todos});
 });
 
 app.post('/', async (req, res) => {
     // ToDo.sync({ force: true })
-    const jane = await ToDo.create({ name: "Jane", status: false });
-    let { data } = req.body;
-    res.json({text: jane});
+    let { name } = req.body;
+    if(!name){
+        res.status(400).json({text : 'name is empty'});
+        return
+    }
+    const todo = await ToDo.create({ name: name, status: false });
+    res.json(todo);
 });
 
 const PORT = process.env.PORT || 3000;
